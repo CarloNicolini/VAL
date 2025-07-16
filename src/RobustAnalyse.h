@@ -17,44 +17,44 @@ using std::vector;
 
 namespace VAL {
 
-  extern bool Robust;
-  extern double RobustPNEJudder;
-  extern bool JudderPNEs;
-  extern bool EventPNEJuddering;
-  extern bool TestingPNERobustness;
-  extern bool LaTeXRecord;
+extern bool Robust;
+extern double RobustPNEJudder;
+extern bool JudderPNEs;
+extern bool EventPNEJuddering;
+extern bool TestingPNERobustness;
+extern bool LaTeXRecord;
 
-  enum RobustMetric { DELAY, ACCUM, MAX };
-  enum RobustDist { UNIFORM, NORMAL, PNORM };
+enum RobustMetric { DELAY, ACCUM, MAX };
+enum RobustDist { UNIFORM, NORMAL, PNORM };
 
-  struct InvalidActionRecord {
+struct InvalidActionRecord {
     int number;
     double time;
     plan_step *ps;
     // set<string> failReasons;
 
     InvalidActionRecord(int no, double t, plan_step *p)
-        : number(no), time(t), ps(p){};
-    ~InvalidActionRecord(){};
-  };
+        : number(no), time(t), ps(p) {};
+    ~InvalidActionRecord() {};
+};
 
-  struct InvalidActionReport {
+struct InvalidActionReport {
     int number;
     map< string, pair< int, string > > failReasons;
 
-    InvalidActionReport() : number(0), failReasons(){};
+    InvalidActionReport() : number(0), failReasons() {};
     InvalidActionReport(int no, string r, string a)
         : number(no), failReasons() {
-      failReasons[r] = make_pair(no, a);
+        failReasons[r] = make_pair(no, a);
     };
-    ~InvalidActionReport(){};
-  };
+    ~InvalidActionReport() {};
+};
 
-  class DerivationRules;
-  class TypeChecker;
+class DerivationRules;
+class TypeChecker;
 
-  class RobustPlanAnalyser {
-   private:
+class RobustPlanAnalyser {
+private:
     const plan *p;
     vector< plan_step * > timedIntitialLiteralActions;
 
@@ -83,7 +83,7 @@ namespace VAL {
     analysis *current_analysis;
     const goal *theGoal;
 
-   public:
+public:
     RobustPlanAnalyser(double rm, int ntp, const DerivationRules *dr,
                        double tol, TypeChecker &tc, const operator_list *ops,
                        const effect_lists *is, const plan *p1,
@@ -112,7 +112,7 @@ namespace VAL {
           operators(ops),
           initialState(is),
           current_analysis(ca),
-          theGoal(g){};
+          theGoal(g) {};
 
     ~RobustPlanAnalyser();
 
@@ -164,10 +164,10 @@ namespace VAL {
     double getRandomNumberNorm();
     double getRandomNumberPsuedoNorm();
     string getDistName();
-  };
+};
 
-  plan *newTestPlan(const plan *p);
-  void deleteTestPlan(plan *p);
+plan *newTestPlan(const plan *p);
+void deleteTestPlan(plan *p);
 
 };  // namespace VAL
 

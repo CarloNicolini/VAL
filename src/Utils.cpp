@@ -10,23 +10,25 @@
 
 namespace VAL {
 
-  void replaceSubStrings(string &s, string s1, string s2) {
+void replaceSubStrings(string &s, string s1, string s2) {
     size_t pos = s.find(s1);
     size_t subPos = pos;
     size_t size = s.size();
 
     for (size_t count = 1; count < size; ++count) {
-      if (subPos != string::npos)
-        s.replace(pos, s1.size(), s2);
-      else
-        break;
+        if (subPos != string::npos)
+            s.replace(pos, s1.size(), s2);
+        else
+            break;
 
-      subPos = (s.substr(pos + s2.size(), string::npos)).find(s1);
-      pos = pos + s2.size() + subPos;
+        subPos = (s.substr(pos + s2.size(), string::npos)).find(s1);
+        pos = pos + s2.size() + subPos;
     };
-  };
+};
 
-  // change any action names etc that LaTeX will not like
-  void latexString(string &s) { replaceSubStrings(s, "_", "\\_"); };
+// change any action names etc that LaTeX will not like
+void latexString(string &s) {
+    replaceSubStrings(s, "_", "\\_");
+};
 
 };  // namespace VAL

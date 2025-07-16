@@ -1,0 +1,44 @@
+# Git
+.git/
+.gitignore
+
+# Docker
+Dockerfile
+.dockerignore
+
+# Virtual environments
+.venv/
+env/
+venv/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Build and distribution
+build/
+dist/
+*.egg-info/
+
+# Test and linting caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.cache
+
+# IDE and editor directories
+.vscode/
+.idea/
+
+# Logs and temporary files
+*.log
+logs/
+
+# Notebooks
+notebooks/
+
+# CI/CD
+bitbucket-pipelines.yml

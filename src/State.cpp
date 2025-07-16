@@ -21,176 +21,176 @@ using std::nan;
 
 namespace VAL {
 
-  vector< StateObserver * > State::sos;
+vector< StateObserver * > State::sos;
 
-  void State::setNew(const effect_lists *is) {
+void State::setNew(const effect_lists *is) {
     logState.clear();
     feValue.clear();
     changedPNEs.clear();
 
     for (list< simple_effect * >::const_iterator i = is->add_effects.begin();
-         i != is->add_effects.end(); ++i) {
-      logState[vld->pf.buildLiteral(*i)] = true;
+            i != is->add_effects.end(); ++i) {
+        logState[vld->pf.buildLiteral(*i)] = true;
     };
 
     for (pc_list< assignment * >::const_iterator i1 =
-             is->assign_effects.begin();
-         i1 != is->assign_effects.end(); ++i1) {
-      const FuncExp *fe = vld->fef.buildFuncExp((*i1)->getFTerm());
-      // DPL 2/2/06: Need to remember which PNEs changed in order to trigger
-      // processes properly in the initial state.
-      changedPNEs.insert(fe);
-      FEScalar feNewValue =
-          dynamic_cast< const num_expression * >((*i1)->getExpr())
-              ->double_value();
+                is->assign_effects.begin();
+            i1 != is->assign_effects.end(); ++i1) {
+        const FuncExp *fe = vld->fef.buildFuncExp((*i1)->getFTerm());
+        // DPL 2/2/06: Need to remember which PNEs changed in order to trigger
+        // processes properly in the initial state.
+        changedPNEs.insert(fe);
+        FEScalar feNewValue =
+            dynamic_cast< const num_expression * >((*i1)->getExpr())
+            ->double_value();
 
-      feValue[fe] = feNewValue;
+        feValue[fe] = feNewValue;
 
-      // setup initial value for LaTeX graph
-      if (LaTeX) {
-        FEGraph *feg = getValidator()->getGraph(fe);
+        // setup initial value for LaTeX graph
+        if (LaTeX) {
+            FEGraph *feg = getValidator()->getGraph(fe);
 
-        // setup initial value if nec
-        if (feg->initialTime == -1) {
-          feg->initialTime = time;
-          feg->initialValue = feNewValue;
+            // setup initial value if nec
+            if (feg->initialTime == -1) {
+                feg->initialTime = time;
+                feg->initialValue = feNewValue;
+            };
         };
-      };
     };
-  };
+};
 
-  State::State(Validator *const v, const effect_lists *is)
-      : tolerance(v->getTolerance()), vld(v), time(0.0) {
+State::State(Validator *const v, const effect_lists *is)
+    : tolerance(v->getTolerance()), vld(v), time(0.0) {
     setNew(is);
-  };
+};
 
-  bool State::evaluate(const SimpleProposition *p) const {
+bool State::evaluate(const SimpleProposition *p) const {
     LogicalState::const_iterator i = logState.find(p);
     if (i != logState.end()) {
-      return i->second;
+        return i->second;
     } else {
-      return false;
+        return false;
     };
-  };
+};
 
-  FEScalar State::evaluate(const FuncExp *fe) const {
+FEScalar State::evaluate(const FuncExp *fe) const {
     NumericalState::const_iterator i = feValue.find(fe);
     if (i != feValue.end()) {
-      return i->second;
+        return i->second;
     } else {
-      return nan("");
+        return nan("");
     }
 
     return evaluateFE(fe);
-  }
+}
 
-  FEScalar State::evaluateFE(const FuncExp *fe) const {
+FEScalar State::evaluateFE(const FuncExp *fe) const {
     NumericalState::const_iterator i = feValue.find(fe);
     if (i != feValue.end()) {
-      return i->second;
+        return i->second;
     } else {
-      if (fe->isExternal()) {
-        return fe->getExternalValue(this);
-      }
-      cerr << "Attempt to access undefined expression: " << *fe << "\n";
-      /*	if(LaTeX)
-              {
-                      *report << "\\error{Attempt to access undefined
-         expression:
-         " << *fe << "}\n";
-              };
-              */
-      // Throw? Yes !
-      // exit(0);
+        if (fe->isExternal()) {
+            return fe->getExternalValue(this);
+        }
+        cerr << "Attempt to access undefined expression: " << *fe << "\n";
+        /*	if(LaTeX)
+                {
+                        *report << "\\error{Attempt to access undefined
+           expression:
+           " << *fe << "}\n";
+                };
+                */
+        // Throw? Yes !
+        // exit(0);
 
-      BadAccessError bae;
-      throw bae;
+        BadAccessError bae;
+        throw bae;
     };
-  };
+};
 
-  FEScalar State::evaluate(const expression *e, const Environment &bs) const {
+FEScalar State::evaluate(const expression *e, const Environment &bs) const {
     if (dynamic_cast< const div_expression * >(e)) {
-      return evaluate(dynamic_cast< const div_expression * >(e)->getLHS(), bs) /
-             evaluate(dynamic_cast< const div_expression * >(e)->getRHS(), bs);
+        return evaluate(dynamic_cast< const div_expression * >(e)->getLHS(), bs) /
+               evaluate(dynamic_cast< const div_expression * >(e)->getRHS(), bs);
     };
 
     if (dynamic_cast< const minus_expression * >(e)) {
-      return evaluate(dynamic_cast< const minus_expression * >(e)->getLHS(),
-                      bs) -
-             evaluate(dynamic_cast< const minus_expression * >(e)->getRHS(),
-                      bs);
+        return evaluate(dynamic_cast< const minus_expression * >(e)->getLHS(),
+                        bs) -
+               evaluate(dynamic_cast< const minus_expression * >(e)->getRHS(),
+                        bs);
     };
 
     if (dynamic_cast< const mul_expression * >(e)) {
-      return evaluate(dynamic_cast< const mul_expression * >(e)->getLHS(), bs) *
-             evaluate(dynamic_cast< const mul_expression * >(e)->getRHS(), bs);
+        return evaluate(dynamic_cast< const mul_expression * >(e)->getLHS(), bs) *
+               evaluate(dynamic_cast< const mul_expression * >(e)->getRHS(), bs);
     };
 
     if (dynamic_cast< const plus_expression * >(e)) {
-      return evaluate(dynamic_cast< const plus_expression * >(e)->getLHS(),
-                      bs) +
-             evaluate(dynamic_cast< const plus_expression * >(e)->getRHS(), bs);
+        return evaluate(dynamic_cast< const plus_expression * >(e)->getLHS(),
+                        bs) +
+               evaluate(dynamic_cast< const plus_expression * >(e)->getRHS(), bs);
     };
 
     if (dynamic_cast< const num_expression * >(e)) {
-      return dynamic_cast< const num_expression * >(e)->double_value();
+        return dynamic_cast< const num_expression * >(e)->double_value();
     };
 
     if (dynamic_cast< const uminus_expression * >(e)) {
-      return -(evaluate(dynamic_cast< const uminus_expression * >(e)->getExpr(),
-                        bs));
+        return -(evaluate(dynamic_cast< const uminus_expression * >(e)->getExpr(),
+                          bs));
     };
 
     if (dynamic_cast< const func_term * >(e)) {
-      const FuncExp *fexp =
-          vld->fef.buildFuncExp(dynamic_cast< const func_term * >(e), bs);
-      return fexp->evaluate(this);
-      // if(feValue.find(fexp) != feValue.end())
-      // return feValue.find(fexp)->second;
-      /*
-                   if(LaTeX)
-                   {
-                           *report << "\\error{Attempt to access undefined
-         expression: " << *fexp << "}\n";
-                   }
-                   else if(Verbose) cout << "Attempt to inspect undefined value:
-         "
-         << *fexp << "\n";
-                    */
-      // BadAccessError bae;
-      // throw bae;
+        const FuncExp *fexp =
+            vld->fef.buildFuncExp(dynamic_cast< const func_term * >(e), bs);
+        return fexp->evaluate(this);
+        // if(feValue.find(fexp) != feValue.end())
+        // return feValue.find(fexp)->second;
+        /*
+                     if(LaTeX)
+                     {
+                             *report << "\\error{Attempt to access undefined
+           expression: " << *fexp << "}\n";
+                     }
+                     else if(Verbose) cout << "Attempt to inspect undefined value:
+           "
+           << *fexp << "\n";
+                      */
+        // BadAccessError bae;
+        // throw bae;
     };
 
     if (const special_val_expr *sp =
-            dynamic_cast< const special_val_expr * >(e)) {
-      if (sp->getKind() == E_TOTAL_TIME) {
-        if (vld->durativePlan()) return time;
-        return vld->simpleLength();
-      };
+                dynamic_cast< const special_val_expr * >(e)) {
+        if (sp->getKind() == E_TOTAL_TIME) {
+            if (vld->durativePlan()) return time;
+            return vld->simpleLength();
+        };
 
-      if (sp->getKind() == E_DURATION_VAR) {
-        return bs.duration;
-      };
+        if (sp->getKind() == E_DURATION_VAR) {
+            return bs.duration;
+        };
 
-      if (sp->getKind() == E_HASHT) {
-        if (LaTeX)
-          *report << "The use of \\#t is not valid in this context!\n";
-        else if (Verbose)
-          cout << "The use of #t is not valid in this context!\n";
-        SyntaxTooComplex stc;
-        throw stc;
-      }
+        if (sp->getKind() == E_HASHT) {
+            if (LaTeX)
+                *report << "The use of \\#t is not valid in this context!\n";
+            else if (Verbose)
+                cout << "The use of #t is not valid in this context!\n";
+            SyntaxTooComplex stc;
+            throw stc;
+        }
     };
 
     if (const violation_term *vt = dynamic_cast< const violation_term * >(e)) {
-      return vld->violationsFor(vt->getName());
+        return vld->violationsFor(vt->getName());
     };
 
     UnrecognisedCondition uc;
     throw uc;
-  };
+};
 
-  bool State::progress(const Happening *h) {
+bool State::progress(const Happening *h) {
     DerivedGoal::resetLists(this);
     resetChanged();
 
@@ -198,16 +198,16 @@ namespace VAL {
     bool canHappen = h->canHappen(this);
 
     if (canHappen || ContinueAnyway) {
-      time = h->getTime();
+        time = h->getTime();
 
-      if (TestingPNERobustness) JudderPNEs = false;
-      return h->applyTo(this) && canHappen;
+        if (TestingPNERobustness) JudderPNEs = false;
+        return h->applyTo(this) && canHappen;
     } else {
-      return false;
+        return false;
     };
-  };
+};
 
-  bool State::progressCtsEvent(const Happening *h) {
+bool State::progressCtsEvent(const Happening *h) {
     DerivedGoal::resetLists(this);
     resetChanged();
 
@@ -215,64 +215,64 @@ namespace VAL {
     bool canHappen = h->canHappen(this);
 
     if (canHappen || ContinueAnyway) {
-      time = h->getTime();
-      if (TestingPNERobustness) JudderPNEs = false;
-      return h->applyTo(this) && canHappen;
+        time = h->getTime();
+        if (TestingPNERobustness) JudderPNEs = false;
+        return h->applyTo(this) && canHappen;
     } else {
-      return false;
+        return false;
     };
-  };
+};
 
-  void State::add(const SimpleProposition *a) {
+void State::add(const SimpleProposition *a) {
     if (LaTeX)
-      *report << " \\> \\adding{" << *a << "}\\\\\n";
+        *report << " \\> \\adding{" << *a << "}\\\\\n";
     else if (Verbose)
-      cout << "Adding " << *a << "\n";
+        cout << "Adding " << *a << "\n";
 
     logState[a] = true;
-  };
+};
 
-  void State::del(const SimpleProposition *a) {
+void State::del(const SimpleProposition *a) {
     if (LaTeX)
-      *report << " \\> \\deleting{" << *a << "}\\\\\n";
+        *report << " \\> \\deleting{" << *a << "}\\\\\n";
     else if (Verbose)
-      cout << "Deleting " << *a << "\n";
+        cout << "Deleting " << *a << "\n";
     logState[a] = false;
-  };
+};
 
-  void State::addChange(const SimpleProposition *a) {
+void State::addChange(const SimpleProposition *a) {
     if (LaTeX)
-      *report << " \\> \\adding{" << *a << "}\\\\\n";
+        *report << " \\> \\adding{" << *a << "}\\\\\n";
     else if (Verbose)
-      cout << "Adding " << *a << "\n";
+        cout << "Adding " << *a << "\n";
 
     if (!(logState[a])) changedLiterals.insert(a);
     logState[a] = true;
-  };
+};
 
-  void State::delChange(const SimpleProposition *a) {
+void State::delChange(const SimpleProposition *a) {
     if (LaTeX)
-      *report << " \\> \\deleting{" << *a << "}\\\\\n";
+        *report << " \\> \\deleting{" << *a << "}\\\\\n";
     else if (Verbose)
-      cout << "Deleting " << *a << "\n";
+        cout << "Deleting " << *a << "\n";
 
     if (logState[a]) changedLiterals.insert(a);
     logState[a] = false;
-  };
+};
 
-  void State::updateChange(const FuncExp *fe, assign_op aop, FEScalar value) {
+void State::updateChange(const FuncExp *fe, assign_op aop, FEScalar value) {
     FEScalar initialValue = feValue[fe];
 
     update(fe, aop, value);
 
     if (feValue[fe] != initialValue) {
-      if (changedPNEs.find(fe) == changedPNEs.end())
-        oldValues[fe] = initialValue;
-      changedPNEs.insert(fe);
+        if (changedPNEs.find(fe) == changedPNEs.end())
+            oldValues[fe] = initialValue;
+        changedPNEs.insert(fe);
     }
-  };
+};
 
-  State &State::operator=(const State &s) {
+State &State::operator=(const State &s) {
     logState = s.logState;
     feValue = s.feValue;
     time = s.time;
@@ -280,112 +280,112 @@ namespace VAL {
     changedPNEs = s.changedPNEs;
 
     return *this;
-  };
+};
 
-  void State::update(const FuncExp *fe, assign_op aop, FEScalar value) {
+void State::update(const FuncExp *fe, assign_op aop, FEScalar value) {
     bool setInitialValue = false;
     FEGraph *feg = 0;
 
     if (LaTeX) {
-      feg = getValidator()->getGraph(fe);
+        feg = getValidator()->getGraph(fe);
 
-      // setup initial value if nec
-      if (feg->initialTime == -1) {
-        map< const FuncExp *, FEScalar >::const_iterator i = feValue.find(fe);
+        // setup initial value if nec
+        if (feg->initialTime == -1) {
+            map< const FuncExp *, FEScalar >::const_iterator i = feValue.find(fe);
 
-        if (i != feValue.end()) {
-          feg->initialTime = 0;
-          feg->initialValue = fe->evaluate(this);
-        } else {
-          feg->initialTime = time;
-          setInitialValue = true;
+            if (i != feValue.end()) {
+                feg->initialTime = 0;
+                feg->initialValue = fe->evaluate(this);
+            } else {
+                feg->initialTime = time;
+                setInitialValue = true;
+            };
         };
-      };
     };
 
     if (Verbose && !LaTeX)
-      *report << "Updating " << *fe << " (" << feValue[fe] << ") by " << value
-              << " ";
+        *report << "Updating " << *fe << " (" << feValue[fe] << ") by " << value
+                << " ";
 
     FEScalar feValueInt = feValue[fe];
 
     switch (aop) {
-      case E_ASSIGN:
+    case E_ASSIGN:
         if (LaTeX) {
-          *report << " \\> \\assignment{" << *fe << "}{" << feValue[fe] << "}{"
-                  << value << "}\\\\\n";
+            *report << " \\> \\assignment{" << *fe << "}{" << feValue[fe] << "}{"
+                    << value << "}\\\\\n";
         } else if (Verbose)
-          cout << "assignment\n";
+            cout << "assignment\n";
         feValue[fe] = value;
         break;
-      case E_ASSIGN_CTS:
+    case E_ASSIGN_CTS:
         if (LaTeX) {
-          *report << " \\> \\assignmentcts{" << *fe << "}{" << feValue[fe]
-                  << "}{" << value << "}\\\\\n";
+            *report << " \\> \\assignmentcts{" << *fe << "}{" << feValue[fe]
+                    << "}{" << value << "}\\\\\n";
         } else if (Verbose)
-          cout << "assignment\n";
+            cout << "assignment\n";
         feValue[fe] = value;
         return;
-      case E_INCREASE:
+    case E_INCREASE:
         if (LaTeX) {
-          *report << " \\> \\increase{" << *fe << "}{" << feValue[fe] << "}{"
-                  << value << "}\\\\\n";
+            *report << " \\> \\increase{" << *fe << "}{" << feValue[fe] << "}{"
+                    << value << "}\\\\\n";
         } else if (Verbose)
-          cout << "increase\n";
+            cout << "increase\n";
         feValue[fe] += value;
         break;
-      case E_DECREASE:
+    case E_DECREASE:
         if (LaTeX) {
-          *report << " \\> \\decrease{" << *fe << "}{" << feValue[fe] << "}{"
-                  << value << "}\\\\\n";
+            *report << " \\> \\decrease{" << *fe << "}{" << feValue[fe] << "}{"
+                    << value << "}\\\\\n";
         } else if (Verbose)
-          cout << "decrease\n";
+            cout << "decrease\n";
         feValue[fe] -= value;
         break;
-      case E_SCALE_UP:
+    case E_SCALE_UP:
         if (LaTeX) {
-          *report << " \\> \\scaleup{" << *fe << "}{" << feValue[fe] << "}{"
-                  << value << "}\\\\\n";
+            *report << " \\> \\scaleup{" << *fe << "}{" << feValue[fe] << "}{"
+                    << value << "}\\\\\n";
         } else if (Verbose)
-          cout << "scale up\n";
+            cout << "scale up\n";
         feValue[fe] *= value;
         break;
-      case E_SCALE_DOWN:
+    case E_SCALE_DOWN:
         if (LaTeX) {
-          *report << " \\> \\scaledown{" << *fe << "}{" << feValue[fe] << "}{"
-                  << value << "}\\\\\n";
+            *report << " \\> \\scaledown{" << *fe << "}{" << feValue[fe] << "}{"
+                    << value << "}\\\\\n";
         } else if (Verbose)
-          cout << "scale down\n";
+            cout << "scale down\n";
         feValue[fe] /= value;
         break;
-      default:
+    default:
         return;
     };
 
     // handle discontinuities in graphs
     if (LaTeX) {
-      if (setInitialValue) {
-        feValueInt = feValue[fe];
-        feg->initialValue = feValueInt;
-      };
-
-      if ((feValueInt != feValue[fe]) || setInitialValue) {
-        // check value is already defined, may be communitive updates at the
-        // same
-        // time
-        map< double, pair< double, double > >::iterator j =
-            feg->discons.find(time);
-
-        if (j == feg->discons.end()) {
-          feg->discons[time] = make_pair(feValueInt, feValue[fe]);
-          feg->happenings.insert(time);
-        } else {
-          j->second.second = feValue[fe];
+        if (setInitialValue) {
+            feValueInt = feValue[fe];
+            feg->initialValue = feValueInt;
         };
-      };
+
+        if ((feValueInt != feValue[fe]) || setInitialValue) {
+            // check value is already defined, may be communitive updates at the
+            // same
+            // time
+            map< double, pair< double, double > >::iterator j =
+                feg->discons.find(time);
+
+            if (j == feg->discons.end()) {
+                feg->discons[time] = make_pair(feValueInt, feValue[fe]);
+                feg->happenings.insert(time);
+            } else {
+                j->second.second = feValue[fe];
+            };
+        };
     };
 
     return;
-  };
+};
 
 };  // namespace VAL

@@ -10,23 +10,27 @@
 
 namespace VAL {
 
-  class State;
-  class Validator;
+class State;
+class Validator;
 
-  class Monitor {
-   protected:
-    Monitor(const Monitor &m){};
+class Monitor {
+protected:
+    Monitor(const Monitor &m) {};
 
-   public:
-    Monitor(){};
+public:
+    Monitor() {};
 
-    virtual ~Monitor(){};
-    virtual bool violationSerious(const State *s) const { return true; };
-    virtual Monitor *copy() const { return new Monitor(*this); };
-  };
+    virtual ~Monitor() {};
+    virtual bool violationSerious(const State *s) const {
+        return true;
+    };
+    virtual Monitor *copy() const {
+        return new Monitor(*this);
+    };
+};
 
-  class PreferenceMonitor : public Monitor {
-   private:
+class PreferenceMonitor : public Monitor {
+private:
     static int id;
     static std::set< int > done;
 
@@ -34,106 +38,114 @@ namespace VAL {
     mutable Validator *vld;
     string name;
 
-   public:
+public:
     PreferenceMonitor(Validator *v, const string &nm)
-        : myId(id++), vld(v), name(nm){};
-    PreferenceMonitor *copy() const { return new PreferenceMonitor(*this); };
+        : myId(id++), vld(v), name(nm) {};
+    PreferenceMonitor *copy() const {
+        return new PreferenceMonitor(*this);
+    };
     bool violationSerious(const State *s) const;
-  };
+};
 
-  class MonitorOwner {
-   private:
+class MonitorOwner {
+private:
     Monitor *mon;
 
-   public:
-    virtual ~MonitorOwner() { delete mon; };
-    MonitorOwner(Validator *v) : mon(new PreferenceMonitor(v, "anonymous")){};
-    MonitorOwner(Validator *v, const string &n)
-        : mon(new PreferenceMonitor(v, n)){};
-    MonitorOwner() : mon(new Monitor()){};
-    MonitorOwner &operator=(const MonitorOwner &m) {
-      delete mon;
-      mon = m.mon->copy();
-      return *this;
+public:
+    virtual ~MonitorOwner() {
+        delete mon;
     };
-    MonitorOwner(const MonitorOwner &m) : mon(m.mon->copy()){};
+    MonitorOwner(Validator *v) : mon(new PreferenceMonitor(v, "anonymous")) {};
+    MonitorOwner(Validator *v, const string &n)
+        : mon(new PreferenceMonitor(v, n)) {};
+    MonitorOwner() : mon(new Monitor()) {};
+    MonitorOwner &operator=(const MonitorOwner &m) {
+        delete mon;
+        mon = m.mon->copy();
+        return *this;
+    };
+    MonitorOwner(const MonitorOwner &m) : mon(m.mon->copy()) {};
     virtual bool violationSerious(const State *s) const {
-      return mon->violationSerious(s);
+        return mon->violationSerious(s);
     };
     void setPreference(Validator *v, const string &nm) {
-      delete mon;
-      mon = new PreferenceMonitor(v, nm);
+        delete mon;
+        mon = new PreferenceMonitor(v, nm);
     };
-  };
+};
 
-  template < typename T >
-  T &passOn(T &t, const MonitorOwner &mo) {
+template < typename T >
+T &passOn(T &t, const MonitorOwner &mo) {
     static_cast< MonitorOwner & >(t) = mo;
     return t;
-  };
+};
 
-  struct PropMonitor : public MonitorOwner {
+struct PropMonitor : public MonitorOwner {
     const Proposition *prop;
-    PropMonitor(const Proposition *p) : prop(p){};
-    const Proposition &operator*() const { return *prop; };
-    const Proposition *operator->() const { return prop; };
-  };
+    PropMonitor(const Proposition *p) : prop(p) {};
+    const Proposition &operator*() const {
+        return *prop;
+    };
+    const Proposition *operator->() const {
+        return prop;
+    };
+};
 
-  struct PropositionPair : public MonitorOwner {
+struct PropositionPair : public MonitorOwner {
     const Proposition *first;
     const Proposition *second;
     PropositionPair(const Proposition *f, const Proposition *s)
-        : first(f), second(s){};
-  };
+        : first(f), second(s) {};
+};
 
-  struct PropositionPO : public MonitorOwner {
+struct PropositionPO : public MonitorOwner {
     set< const Proposition * > active;
     map< const Proposition *, int > predecessors;
     map< const Proposition *, vector< const Proposition * > > succs;
     void add(const Proposition *p, const Proposition *q) {
-      //        cout << "Adding " << *p << " -> " << *q << "\n";
-      predecessors[q] += 1;
-      succs[p].push_back(q);
-      set< const Proposition * >::iterator iq = active.find(q);
-      if (iq != active.end()) {
-        active.erase(q);
-      }
-      if (succs[p].size() == 1) {
-        active.insert(p);
-      }
+        //        cout << "Adding " << *p << " -> " << *q << "\n";
+        predecessors[q] += 1;
+        succs[p].push_back(q);
+        set< const Proposition * >::iterator iq = active.find(q);
+        if (iq != active.end()) {
+            active.erase(q);
+        }
+        if (succs[p].size() == 1) {
+            active.insert(p);
+        }
     }
 
-    PropositionPO(){};
-  };
+    PropositionPO() {};
+};
 
-  struct Deadlined : public MonitorOwner {
+struct Deadlined : public MonitorOwner {
     double first;
     const Proposition *second;
-    Deadlined(double d, const Proposition *p) : first(d), second(p){};
-  };
+    Deadlined(double d, const Proposition *p) : first(d), second(p) {};
+};
 
-  struct TriggeredDeadlined : public MonitorOwner {
+struct TriggeredDeadlined : public MonitorOwner {
     const Proposition *first;
     pair< double, const Proposition * > second;
     TriggeredDeadlined(const Proposition *p, const Deadlined &d)
-        : first(p), second(make_pair(d.first, d.second)){};
-  };
+        : first(p), second(make_pair(d.first, d.second)) {};
+};
 
-  struct Window : public MonitorOwner {
+struct Window : public MonitorOwner {
     pair< double, double > first;
     const Proposition *second;
     Window(const pair< double, double > &pds, const Proposition *p)
-        : first(pds), second(p){};
-  };
+        : first(pds), second(p) {};
+};
 
-  typedef vector< PropMonitor > Propositions;
-  typedef vector< PropositionPair > PropositionPairs;
-  typedef vector< Deadlined > Deadlines;
-  typedef vector< TriggeredDeadlined > TriggeredDeadlines;
-  typedef vector< Window > Windows;
+typedef vector< PropMonitor > Propositions;
+typedef vector< PropositionPair > PropositionPairs;
+typedef vector< Deadlined > Deadlines;
+typedef vector< TriggeredDeadlined > TriggeredDeadlines;
+typedef vector< Window > Windows;
 
-  class TrajectoryConstraintsMonitor {
-   private:
+class TrajectoryConstraintsMonitor {
+private:
     bool isActive;
 
     // Interactions with continuous effects are much harder - ignore that for
@@ -184,14 +196,14 @@ namespace VAL {
 
     Validator *vld;
 
-   public:
+public:
     TrajectoryConstraintsMonitor(Validator *v, con_goal *cg1, con_goal *cg2);
 
     ~TrajectoryConstraintsMonitor();
 
     bool checkAtState(const State &s);
     bool checkFinalState(const State &s);
-  };
+};
 
 };  // namespace VAL
 

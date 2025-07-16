@@ -15,21 +15,21 @@ using std::vector;
 
 namespace VAL {
 
-  class State;
-  class Environment;
+class State;
+class Environment;
 
-  class PredWriter : public VisitController {
-   private:
+class PredWriter : public VisitController {
+private:
     ostream &out;
 
-   public:
-    PredWriter(ostream &o) : out(o){};
+public:
+    PredWriter(ostream &o) : out(o) {};
 
     virtual void visit_durative_action(const durative_action *d);
-  };
+};
 
-  class RelaxTranslator : public WriteController {
-   private:
+class RelaxTranslator : public WriteController {
+private:
     const analysis *anlss;
     const domain *dom;
     bool inInitial;
@@ -37,15 +37,15 @@ namespace VAL {
     bool firstCall;
     bool showFixedEffect;
 
-   public:
-    virtual ~RelaxTranslator(){};
+public:
+    virtual ~RelaxTranslator() {};
     RelaxTranslator(const analysis *a)
         : anlss(a),
           dom(a->the_domain),
           inInitial(false),
           showType(true),
           firstCall(true),
-          showFixedEffect(false){};
+          showFixedEffect(false) {};
 
     virtual void write_symbol(ostream &o, const symbol *);
     virtual void write_const_symbol(ostream &o, const const_symbol *);
@@ -92,9 +92,9 @@ namespace VAL {
     virtual void write_problem(ostream &o, const problem *);
     virtual void write_plan_step(ostream &o, const plan_step *);
 
-   private:
+private:
     virtual void collect_symbols(var_symbol_list &vs, const expression *e);
-  };
+};
 
 };  // namespace VAL
 

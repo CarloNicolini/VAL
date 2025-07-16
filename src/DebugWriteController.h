@@ -8,13 +8,13 @@
 
 namespace VAL {
 
-  class DebugWriteController : public WriteController {
-   protected:
+class DebugWriteController : public WriteController {
+protected:
     int indent;
 
-   public:
-    DebugWriteController() : indent(0){};
-    virtual ~DebugWriteController(){};
+public:
+    DebugWriteController() : indent(0) {};
+    virtual ~DebugWriteController() {};
 
     virtual void write_symbol(ostream &o, const symbol *);
     virtual void write_control_symbol(ostream &o, const control_symbol *);
@@ -53,7 +53,7 @@ namespace VAL {
     virtual void write_supplied_effect(ostream &o, const supplied_effect *);
     virtual void write_timed_effect(ostream &o, const timed_effect *);
     virtual void write_timed_initial_literal(ostream &o,
-                                             const timed_initial_literal *);
+            const timed_initial_literal *);
     virtual void write_effect_lists(ostream &o, const effect_lists *);
     virtual void write_operator_list(ostream &o, const operator_list *);
     virtual void write_derivations_list(ostream &o, const derivations_list *d);
@@ -72,7 +72,7 @@ namespace VAL {
     virtual void write_preference(ostream &o, const preference *);
     virtual void write_violation_term(ostream &o, const violation_term *);
     virtual void write_constraint_goal(ostream &o, const constraint_goal *);
-  };
+};
 
 };  // namespace VAL
 

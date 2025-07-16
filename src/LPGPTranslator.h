@@ -14,38 +14,38 @@ using std::vector;
 
 namespace VAL {
 
-  class State;
-  class Environment;
+class State;
+class Environment;
 
-  class duration_expression {
-   private:
+class duration_expression {
+private:
     string nm;
     var_symbol_list vars;
     const expression *exp;
 
-   public:
+public:
     duration_expression(const string &op, const var_symbol_list &vs,
                         const expression *e)
-        : nm(op), vars(vs), exp(e){};
+        : nm(op), vars(vs), exp(e) {};
 
     string createAll(State &);
     bool bindAll(Environment &, State &, const expression *);
     bool nextBinding(Environment &, State &, const expression *);
     void recordOne(stringstream &, State &, Environment &);
-  };
+};
 
-  class LPGPTranslator : public WriteController {
-   private:
+class LPGPTranslator : public WriteController {
+private:
     const analysis *anlss;
     const domain *dom;
     time_spec filter;
 
     vector< duration_expression > duration_expressions;
 
-   public:
-    virtual ~LPGPTranslator(){};
+public:
+    virtual ~LPGPTranslator() {};
     LPGPTranslator(const analysis *a)
-        : anlss(a), dom(a->the_domain), filter(E_AT_START){};
+        : anlss(a), dom(a->the_domain), filter(E_AT_START) {};
 
     string yieldDurations();
 
@@ -93,7 +93,7 @@ namespace VAL {
     virtual void write_length_spec(ostream &o, const length_spec *);
     virtual void write_problem(ostream &o, const problem *);
     virtual void write_plan_step(ostream &o, const plan_step *);
-  };
+};
 
 };  // namespace VAL
 

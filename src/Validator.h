@@ -62,22 +62,22 @@
 
 namespace VAL {
 
-  extern bool makespanDefault;
-  extern bool stepLengthDefault;
+extern bool makespanDefault;
+extern bool stepLengthDefault;
 
-  class plan;
-  class TypeChecker;
+class plan;
+class TypeChecker;
 
-  struct FEGraph {
+struct FEGraph {
     const FuncExp *fe;
     string title;
     map< double, double > points;
     set< double > happenings;
     map< double, pair< double, double > > discons;  // discontinuities; time ,
-                                                    // left
-                                                    // hand side value and right
+    // left
+    // hand side value and right
     double initialTime;  // first time FE is defined, -1 denotes time not yet
-                         // defined
+    // defined
     double initialValue;
 
     double maxValue;
@@ -97,7 +97,7 @@ namespace VAL {
           initialTime(-1),
           initialValue(0),
           maxValue(0),
-          minValue(0){};
+          minValue(0) {};
     FEGraph(string t, double min, double max)
         : fe(0),
           title(t),
@@ -107,7 +107,7 @@ namespace VAL {
           initialTime(0),
           initialValue(0),
           maxValue(max),
-          minValue(min){};
+          minValue(min) {};
     ~FEGraph();
 
     void setMinMax();
@@ -116,9 +116,9 @@ namespace VAL {
     void drawLaTeXLine(double t1, double y1, double t2, double y2,
                        double maxTime) const;
     void amendPoints(double maxTime);
-  };
+};
 
-  struct GanttElement {
+struct GanttElement {
     double start;
     double end;
     string label;
@@ -126,14 +126,14 @@ namespace VAL {
     vector< string > sigObjs;  // significant objects for this Element
 
     GanttElement(double s, double e, string l, vector< string > so)
-        : start(s), end(e), label(l), sigObjs(so){};
-  };
+        : start(s), end(e), label(l), sigObjs(so) {};
+};
 
-  struct Gantt {
+struct Gantt {
     double maxTime;
     vector< string > sigObjs;  // significant objects, will tried to be grouped
-                               // in
-                               // gantt chart
+    // in
+    // gantt chart
     vector< string > usedSigObjs;
 
     map< int, map< int, GanttElement * > > chartRows;
@@ -142,7 +142,7 @@ namespace VAL {
     static const double graphV;
     static const int pointSize;
 
-    Gantt() : maxTime(0), sigObjs(), usedSigObjs(), chartRows(){};
+    Gantt() : maxTime(0), sigObjs(), usedSigObjs(), chartRows() {};
 
     ~Gantt();
 
@@ -169,17 +169,17 @@ namespace VAL {
     void drawLaTeXElement(const GanttElement *ge, int row, int pos,
                           double startTime, double endTime, int numRows) const;
     pair< double, double > transPoint(double x, double y) const;
-  };
+};
 
-  class DerivationRules {
-   private:
+class DerivationRules {
+private:
     derivations_list *drvs;
     const operator_list *ops;
     map< string, pair< const goal *, const var_symbol_table * > > derivPreds;
     vector< const disj_goal * > repeatedDPDisjs;  // used to keep list of disj
-                                                  // to be
-                                                  // deleted
-   public:
+    // to be
+    // deleted
+public:
     DerivationRules(const derivations_list *d, const operator_list *o);
     ~DerivationRules();
 
@@ -192,31 +192,31 @@ namespace VAL {
     bool effects(const effect_lists *efflist) const;
     bool isDerivedPred(string s) const;
     map< string, pair< const goal *, const var_symbol_table * > >
-        getDerivPreds() const {
-      return derivPreds;
+    getDerivPreds() const {
+        return derivPreds;
     };
-  };
+};
 
-  void changeVars(goal *g,
-                  map< parameter_symbol *, parameter_symbol * > varMap);
-  void changeVars(expression *e,
-                  map< parameter_symbol *, parameter_symbol * > varMap);
+void changeVars(goal *g,
+                map< parameter_symbol *, parameter_symbol * > varMap);
+void changeVars(expression *e,
+                map< parameter_symbol *, parameter_symbol * > varMap);
 
-  class GoalTracker {
-   private:
+class GoalTracker {
+private:
     const goal *finalGoal;
     goal_list trajGoals;
 
-   public:
+public:
     GoalTracker(const goal *goals, const con_goal *constraints);
-  };
+};
 
-  class Validator {
-   public:
+class Validator {
+public:
     FuncExpFactory fef;
     PropositionFactory pf;
 
-   private:
+private:
     ErrorLog errorLog;
     const DerivationRules *derivRules;
     Events events;
@@ -236,7 +236,7 @@ namespace VAL {
     map< const FuncExp *, FEGraph * > graphs;
     Gantt gantt;
 
-   protected:
+protected:
     Plan theplan;
     State state;
 
@@ -245,21 +245,21 @@ namespace VAL {
 
     Plan::const_iterator thisStep;
 
-   private:
+private:
     map< string, int > violations;
 
     TrajectoryConstraintsMonitor tjm;
 
     bool step();
 
-  public:
+public:
     void computeMetric(const State *, vector< double > &) const;
     int numMetrics() const
     {
-      if(metric && metric->expr) return metric->expr->size();
-      return 0;
+        if(metric && metric->expr) return metric->expr->size();
+        return 0;
     }
-   
+
     Validator(const DerivationRules *dr, double tol, TypeChecker &tc,
               const operator_list *ops, const effect_lists *is, const plan *p,
               const metric_spec *m, bool lengthDefault, bool isDur,
@@ -285,7 +285,7 @@ namespace VAL {
           followUp(theplan.end()),
           thisStep(theplan.begin()),
           tjm(this, cg1, cg2) {
-      Polynomial::setAccuracy(tol);
+        Polynomial::setAccuracy(tol);
     };
     Validator(const DerivationRules *dr, double tol, TypeChecker &tc,
               const operator_list *ops, const effect_lists *is,
@@ -312,7 +312,7 @@ namespace VAL {
           followUp(theplan.end()),
           thisStep(theplan.begin()),
           tjm(this, cg1, cg2) {
-      Polynomial::setAccuracy(tol);
+        Polynomial::setAccuracy(tol);
     };
     ~Validator();
 
@@ -325,11 +325,17 @@ namespace VAL {
     vector< double > finalValue() const;
     int simpleLength() const;
     bool durativePlan() const;
-    double getTolerance() const { return tolerance; };
-    void registerAction(Action *a) { actionRegistry.push_back(a); };
-    void addInvariantWarning(string s) { invariantWarnings.push_back(s); };
+    double getTolerance() const {
+        return tolerance;
+    };
+    void registerAction(Action *a) {
+        actionRegistry.push_back(a);
+    };
+    void addInvariantWarning(string s) {
+        invariantWarnings.push_back(s);
+    };
     bool hasInvariantWarnings() const {
-      return (!(invariantWarnings.empty()));
+        return (!(invariantWarnings.empty()));
     };
 
     void displayInvariantWarnings() const;
@@ -339,76 +345,102 @@ namespace VAL {
     void displayLaTeXGraphs() const;
     void setMaxTime();
     void setSigObjs(vector< string > &objects);
-    double getMaxTime() { return maxTime; };
+    double getMaxTime() {
+        return maxTime;
+    };
     bool graphsToShow() const;
     FEGraph *getGraph(const FuncExp *fe);
     void drawLaTeXGantt(int noPages, int noPageRows);
 
-    bool hasEvents() const { return events.hasEvents(); };
-    Events &getEvents() { return events; };
+    bool hasEvents() const {
+        return events.hasEvents();
+    };
+    Events &getEvents() {
+        return events;
+    };
     double getNextHappeningTime() const;
     double getCurrentHappeningTime() const;
     bool isLastHappening() const;
 
-    ErrorLog &getErrorLog() { return errorLog; };
-    analysis *getAnalysis() const { return current_analysis; };
+    ErrorLog &getErrorLog() {
+        return errorLog;
+    };
+    analysis *getAnalysis() const {
+        return current_analysis;
+    };
     void adjustActiveCtsEffects(ActiveCtsEffects *ace) {
-      (*thisStep)->adjustActiveCtsEffects(*ace);
+        (*thisStep)->adjustActiveCtsEffects(*ace);
     };
     ActiveCtsEffects *getActiveCtsEffects() {
-      return thisStep.getActiveCtsEffects();
+        return thisStep.getActiveCtsEffects();
     };
     ExecutionContext *getExecutionContext() {
-      return thisStep.getExecutionContext();
+        return thisStep.getExecutionContext();
     };
 
-    const State &getState() const { return state; };
-    void setState(const effect_lists *effs) { state.setNew(effs); };
+    const State &getState() const {
+        return state;
+    };
+    void setState(const effect_lists *effs) {
+        state.setNew(effs);
+    };
     bool executeHappening(const Happening *h);
     bool executeHappeningCtsEvent(const Happening *h);
-    const DerivationRules *getDerivRules() const { return derivRules; };
+    const DerivationRules *getDerivRules() const {
+        return derivRules;
+    };
 
     vector< const_symbol * > range(const var_symbol *v);
 
-    Plan::const_iterator begin() const { return theplan.begin(); };
+    Plan::const_iterator begin() const {
+        return theplan.begin();
+    };
 
-    Plan::const_iterator end() const { return theplan.end(); };
-    Plan::const_iterator recoverStep() { return thisStep; };
+    Plan::const_iterator end() const {
+        return theplan.end();
+    };
+    Plan::const_iterator recoverStep() {
+        return thisStep;
+    };
     bool extendPlan(Happening *h);
 
     double timeOf(const Action *a) const;
     void countViolation(const State *s, const string &nm,
                         const AdviceProposition *a) {
-      // Do we want to count this violation? It will depend on whether it is
-      // being
-      // evaluated in the execution phase or repair phase.
-      ++violations[nm];
-      if (Verbose) {
-        if (LaTeX) {
-          *report << "Preference " << nm << ": ";
-          a->displayLaTeX();
-          *report << " violated at " << s->getTime() << "\\\\\n";
-        } else {
-          cout << "Preference " << nm << ": ";
-          a->display();
-          cout << " violated at " << s->getTime() << "\n";
+        // Do we want to count this violation? It will depend on whether it is
+        // being
+        // evaluated in the execution phase or repair phase.
+        ++violations[nm];
+        if (Verbose) {
+            if (LaTeX) {
+                *report << "Preference " << nm << ": ";
+                a->displayLaTeX();
+                *report << " violated at " << s->getTime() << "\\\\\n";
+            } else {
+                cout << "Preference " << nm << ": ";
+                a->display();
+                cout << " violated at " << s->getTime() << "\n";
+            };
         };
-      };
     };
-    int violationsFor(const string &nm) { return violations[nm]; };
+    int violationsFor(const string &nm) {
+        return violations[nm];
+    };
     void reportViolations() const;
-    void resetStep(const Plan::const_iterator &n) { thisStep = n; };
-  };
+    void resetStep(const Plan::const_iterator &n) {
+        thisStep = n;
+    };
+};
 
-  class PlanRepair {
-   private:
+class PlanRepair {
+private:
     const plan *p;
     vector< plan_step * > timedInitialLiteralActions;
     double deadLine;
 
     Validator v;  // contains ErrorLog with vector of unsatisfied conditions
-                  // each
-                  // owning an AdviceProposition
+    // each
+    // owning an AdviceProposition
 
     // the following are used for creating new Validator objects
     TypeChecker &typeC;
@@ -421,7 +453,7 @@ namespace VAL {
     // for checking the goal
     const goal *theGoal;
 
-   public:
+public:
     PlanRepair(vector< plan_step * > initLits, double dl,
                const DerivationRules *dr, double tol, TypeChecker &tc,
                const operator_list *ops, const effect_lists *is, const plan *p1,
@@ -438,19 +470,25 @@ namespace VAL {
           durative(isDur),
           operators(ops),
           initialState(is),
-          theGoal(g){};
+          theGoal(g) {};
 
-    ~PlanRepair(){};
-    void setDeadline(double d) { deadLine = d; };
+    ~PlanRepair() {};
+    void setDeadline(double d) {
+        deadLine = d;
+    };
     void setPlanAndTimedInitLits(const plan *p,
                                  set< plan_step * > lockedActions);
     void advice(ErrorLog &el);
     void firstPlanAdvice();
-    Validator &getValidator() { return v; };
+    Validator &getValidator() {
+        return v;
+    };
     vector< const UnsatCondition * > getUnSatConditions() {
-      return v.getErrorLog().getConditions();
+        return v.getErrorLog().getConditions();
     };  // conditions of only Validator object for now
-    const plan *getPlan() const { return p; };
+    const plan *getPlan() const {
+        return p;
+    };
     bool isInTimeInitialLiteralList(const plan_step *ps);
     set< const Action * > getUniqueFlawedActions(Validator *vld);
     bool repairPlanBeagle();
@@ -464,12 +502,12 @@ namespace VAL {
     bool shakePlan(const plan *repairingPlan, const plan_step *firstAction,
                    double variation);
     void setState(const effect_lists *effs) {
-      initialState = effs;
-      v.setState(effs);
+        initialState = effs;
+        v.setState(effs);
     };
-  };
+};
 
-  double getMaxTime(const plan *aPlan);
+double getMaxTime(const plan *aPlan);
 
 };  // namespace VAL
 

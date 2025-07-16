@@ -8,18 +8,18 @@
 
 namespace VAL {
 
-  class GoalHypothesisSpace {
-   public:
-    virtual ~GoalHypothesisSpace(){};
+class GoalHypothesisSpace {
+public:
+    virtual ~GoalHypothesisSpace() {};
     virtual void write(std::ostream& o) const {
-      std::cout << "Goal Hypothesis Space:\n<< >>\n";
+        std::cout << "Goal Hypothesis Space:\n<< >>\n";
     };
-  };
+};
 
-  std::ostream& operator<<(std::ostream& o, const GoalHypothesisSpace& g) {
+std::ostream& operator<<(std::ostream& o, const GoalHypothesisSpace& g) {
     g.write(o);
     return o;
-  };
+};
 
 }  // namespace VAL
 

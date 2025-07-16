@@ -22,24 +22,24 @@ using namespace TIM;
 
 namespace VAL {
 
-  struct PinguPosition {
+struct PinguPosition {
     float first;
     float second;
     int di;
 
-    PinguPosition(float f1, float f2, int d) : first(f1), second(f2), di(d){};
-  };
+    PinguPosition(float f1, float f2, int d) : first(f1), second(f2), di(d) {};
+};
 
-  struct PinguAction {
+struct PinguAction {
     string name;
     int x;
     int y;
 
-    PinguAction(string n, int x1, int y1) : name(n), x(x1), y(y1){};
-  };
+    PinguAction(string n, int x1, int y1) : name(n), x(x1), y(y1) {};
+};
 
-  class PinguPlanGen : public VisitController {
-   private:
+class PinguPlanGen : public VisitController {
+private:
     map< string, pair< float, float > > position;
     set< string > midairLocs;
     map< string, string > bounceLocs;
@@ -66,30 +66,30 @@ namespace VAL {
     PinguPosition getPosition(string);
     void doThis(string, string);
 
-   public:
+public:
     PinguPlanGen(char *name);
 
     virtual void visit_effect_lists(effect_lists *el) {
-      for (pc_list< simple_effect * >::iterator i = el->add_effects.begin();
-           i != el->add_effects.end(); ++i) {
-        (*i)->visit(this);
-      };
+        for (pc_list< simple_effect * >::iterator i = el->add_effects.begin();
+                i != el->add_effects.end(); ++i) {
+            (*i)->visit(this);
+        };
 
-      for (pc_list< assignment * >::iterator i = el->assign_effects.begin();
-           i != el->assign_effects.end(); ++i) {
-        (*i)->visit(this);
-      };
+        for (pc_list< assignment * >::iterator i = el->assign_effects.begin();
+                i != el->assign_effects.end(); ++i) {
+            (*i)->visit(this);
+        };
 
-      for (pc_list< timed_effect * >::iterator i = el->timed_effects.begin();
-           i != el->timed_effects.end(); ++i) {
-        (*i)->visit(this);
-      };
+        for (pc_list< timed_effect * >::iterator i = el->timed_effects.begin();
+                i != el->timed_effects.end(); ++i) {
+            (*i)->visit(this);
+        };
     };
 
     virtual void visit_simple_effect(simple_effect *se);
 
     virtual void visit_plan_step(plan_step *p);
-  };
+};
 
 };  // namespace VAL
 

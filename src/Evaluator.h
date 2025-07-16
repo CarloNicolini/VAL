@@ -11,18 +11,18 @@
 #include <vector>
 
 namespace VAL {
-  class State;
-  class FastEnvironment;
-  class Validator;
+class State;
+class FastEnvironment;
+class Validator;
 
 };  // namespace VAL
 
 namespace Inst {
 
-  class instantiatedOp;
+class instantiatedOp;
 
-  class Evaluator : public VAL::VisitController {
-   protected:
+class Evaluator : public VAL::VisitController {
+protected:
     VAL::Validator *vld;
 
     bool value;
@@ -36,7 +36,7 @@ namespace Inst {
     bool ignoreMetrics;
     bool context;
 
-   public:
+public:
     static void setInitialState();
 
     Evaluator(VAL::Validator *v, const VAL::State *s, Inst::instantiatedOp *op,
@@ -55,8 +55,10 @@ namespace Inst {
     virtual void visit_process(VAL::process *p);
     virtual void visit_action(VAL::action *o);
     virtual void visit_durative_action(VAL::durative_action *da);
-    bool operator()() { return value; };
-  };
+    bool operator()() {
+        return value;
+    };
+};
 
 };  // namespace Inst
 

@@ -11,30 +11,34 @@
 
 namespace SAS {
 
-  class CausalGraph {
-   public:
+class CausalGraph {
+public:
     typedef pair< const VAL::pddl_type *, int > Var;
     typedef std::set< Var > Vars;
     typedef std::map< Var, Vars > Graph;
 
-   private:
+private:
     FunctionStructure fs;
 
     Graph dependencies;
     Graph dependents;
 
-   public:
+public:
     CausalGraph();
-    const Vars &getDependencies(Var p) { return dependencies[p]; };
-    const Vars &getDependents(Var p) { return dependents[p]; };
+    const Vars &getDependencies(Var p) {
+        return dependencies[p];
+    };
+    const Vars &getDependents(Var p) {
+        return dependents[p];
+    };
     void add(Var, Var);
     void write(std::ostream &o) const;
-  };
+};
 
-  inline std::ostream &operator<<(std::ostream &o, const CausalGraph &cg) {
+inline std::ostream &operator<<(std::ostream &o, const CausalGraph &cg) {
     cg.write(o);
     return o;
-  };
+};
 
 }  // namespace SAS
 

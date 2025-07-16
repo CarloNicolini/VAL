@@ -12,24 +12,24 @@
 
 using std::set;
 namespace VAL {
-  class AccumulatedDelta : public StateObserver {
-   public:
+class AccumulatedDelta : public StateObserver {
+public:
     AccumulatedDelta();
     virtual ~AccumulatedDelta();
 
     void notifyChanged(const State *, const Happening *);
     void reset();
     const set< const FuncExp * > &getChangedPNEs() const {
-      return changedPNEs;
+        return changedPNEs;
     };
     const set< const SimpleProposition * > &getChangedLiterals() const {
-      return changedLiterals;
+        return changedLiterals;
     };
 
-   private:
+private:
     set< const FuncExp * > changedPNEs;
     set< const SimpleProposition * > changedLiterals;
-  };
+};
 }  // namespace VAL
 
 #endif  // ACCUMULATEDDELTA_H

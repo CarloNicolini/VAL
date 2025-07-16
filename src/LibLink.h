@@ -16,16 +16,16 @@ using VAL::class_def;
 
 namespace ExternalSupport {
 
-  class LibLoader {
-   private:
+class LibLoader {
+private:
     vector< void * > handles;
     static void *getLib(class_def *cd);
 
-   public:
+public:
     static double makeCall(class_def *cd, const string &nm,
                            vector< string > args);
     ~LibLoader();
-  };
+};
 
 };  // namespace ExternalSupport
 

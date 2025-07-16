@@ -12,61 +12,63 @@
 
 namespace VAL {
 
-  class TypeChecker;
+class TypeChecker;
 };
 
 namespace Inst {
 
-  typedef std::set< VAL::pred_symbol * > IState0Arity;
-  typedef std::map< VAL::pred_symbol *, vector< VAL::parameter_symbol_list * > >
-      IState;
+typedef std::set< VAL::pred_symbol * > IState0Arity;
+typedef std::map< VAL::pred_symbol *, vector< VAL::parameter_symbol_list * > >
+IState;
 
-  class PrimitiveEvaluator {
-   protected:
+class PrimitiveEvaluator {
+protected:
     bool &valueTrue;
     bool &unknownTrue;
     bool &valueFalse;
     bool &unknownFalse;
 
-   public:
+public:
     PrimitiveEvaluator(bool &xt, bool &yt, bool &xf, bool &yf)
-        : valueTrue(xt), unknownTrue(yt), valueFalse(xf), unknownFalse(yf){};
-    virtual ~PrimitiveEvaluator(){};
+        : valueTrue(xt), unknownTrue(yt), valueFalse(xf), unknownFalse(yf) {};
+    virtual ~PrimitiveEvaluator() {};
     virtual void evaluateSimpleGoal(VAL::FastEnvironment *f,
                                     VAL::simple_goal *s) {
-      unknownTrue = true;
-      unknownFalse = true;
+        unknownTrue = true;
+        unknownFalse = true;
     };
-  };
+};
 
-  template < typename PE >
-  class PrimitiveEvaluatorConstructor {
-   public:
+template < typename PE >
+class PrimitiveEvaluatorConstructor {
+public:
     PrimitiveEvaluator *operator()(bool &v, bool &u, bool &w, bool &x) {
-      return new PE(v, u, w, x);
+        return new PE(v, u, w, x);
     }
-  };
+};
 
-  class InitialStateEvaluator : public PrimitiveEvaluator {
-   protected:
+class InitialStateEvaluator : public PrimitiveEvaluator {
+protected:
     friend class ParameterDomainConstraints;
     friend class LitStoreEvaluator;
     static IState initState;
     static IState0Arity init0State;
 
-   public:
+public:
     InitialStateEvaluator(bool &v, bool &u, bool &w, bool &x)
-        : PrimitiveEvaluator(v, u, w, x){};
+        : PrimitiveEvaluator(v, u, w, x) {};
     static void setInitialState();
     virtual void evaluateSimpleGoal(VAL::FastEnvironment *f,
                                     VAL::simple_goal *s);
-    static const IState0Arity &getInit0State() { return init0State; }
-  };
+    static const IState0Arity &getInit0State() {
+        return init0State;
+    }
+};
 
-  typedef PrimitiveEvaluatorConstructor< InitialStateEvaluator > ISC;
+typedef PrimitiveEvaluatorConstructor< InitialStateEvaluator > ISC;
 
-  class SimpleEvaluator : public VAL::VisitController {
-   protected:
+class SimpleEvaluator : public VAL::VisitController {
+protected:
     bool valueTrue;
     bool unknownTrue;
     bool valueFalse;
@@ -84,7 +86,7 @@ namespace Inst {
 
     PrimitiveEvaluator *const primev;
 
-   public:
+public:
     static bool verbose;
 
     template < typename PEC >
@@ -98,25 +100,31 @@ namespace Inst {
           tc(tcIn),
           f(ff),
           equality(VAL::current_analysis->pred_tab.symbol_probe("=")),
-          primev(pec(valueTrue, unknownTrue, valueFalse, unknownFalse)){};
+          primev(pec(valueTrue, unknownTrue, valueFalse, unknownFalse)) {};
 
-    ~SimpleEvaluator() { delete primev; };
+    ~SimpleEvaluator() {
+        delete primev;
+    };
 
-    bool reallyTrue() const { return !unknownTrue && valueTrue; };
+    bool reallyTrue() const {
+        return !unknownTrue && valueTrue;
+    };
     bool reallyFalse() const {
-      // return !unknownTrue && !valueTrue;
-      return !unknownFalse && valueFalse;
+        // return !unknownTrue && !valueTrue;
+        return !unknownFalse && valueFalse;
     };
 
     void prepareForVisit(VAL::FastEnvironment *const ff) {
-      f = ff;
-      valueTrue = true;
-      unknownTrue = false;
-      valueFalse = false;
-      unknownFalse = false;
+        f = ff;
+        valueTrue = true;
+        unknownTrue = false;
+        valueFalse = false;
+        unknownFalse = false;
     }
 
-    static void setInitialState() { InitialStateEvaluator::setInitialState(); };
+    static void setInitialState() {
+        InitialStateEvaluator::setInitialState();
+    };
 
     virtual void visit_simple_goal(VAL::simple_goal *);
     virtual void visit_qfied_goal(VAL::qfied_goal *);
@@ -145,7 +153,7 @@ namespace Inst {
     virtual void visit_special_val_expr(VAL::special_val_expr *s);
     virtual void visit_func_term(VAL::func_term *s);
     virtual void visit_class_func_term(VAL::class_func_term *s);
-  };
+};
 
 };  // namespace Inst
 

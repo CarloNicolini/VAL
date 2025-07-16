@@ -1,6 +1,40 @@
 # VAL
 
+**Note:** This repository is a cleaned copy of the main [KCL VAL project](https://github.com/KCL-Planning/VAL). It removes many unnecessary contents and binaries, drops Windows support, and features a much-simplified structure and CMake files to better support compilation on Mac and Linux systems.
+It also makes it possible to build VAL with Docker, for improved compatibility.
+
 [![Build Status](https://dev.azure.com/schlumberger/ai-planning-validation/_apis/build/status/ai-planning-tool-val-CI?branchName=master)](https://dev.azure.com/schlumberger/ai-planning-validation/_build/latest?definitionId=2&branchName=master)
+
+## How to use Docker
+
+You can build and run VAL applications using Docker for improved compatibility and ease of setup. Here is the typical workflow:
+
+### 1. Build the Docker image
+
+```sh
+# From the root of the repository
+docker build -t val .
+```
+
+### 2. Run a VAL application
+
+You can run any of the VAL applications (e.g., `validate`, `analyze`, etc.) using the following command:
+
+```sh
+docker run --rm -v $(pwd):/workspace val <application> <args>
+```
+
+- Replace `<application>` with the name of the VAL executable you want to run (e.g., `validate`, `analyze`, `domainview`, etc.).
+- Replace `<args>` with the arguments you would normally pass to the application (e.g., domain/problem/plan files).
+- The `-v $(pwd):/workspace` option mounts your current directory into the container, so you can access your files.
+
+#### Example: Validate a plan
+
+```sh
+docker run --rm -v $(pwd):/workspace val Validate domain.pddl problem.pddl plan.txt
+```
+
+This will run the `validate` tool inside the Docker container, using the files from your current directory.
 
 This repository hosts tools for AI Planning plans and planning models.
 
@@ -101,7 +135,7 @@ It usually tells you where you are missing a pre-condition, or where you are vio
 
 Validate has many command line options, but the most important first few are:
 
-`Validate -t <number> -v <domainfile> <problemfile> <planfile....>`
+`validate -t <number> -v <domainfile> <problemfile> <planfile....>`
 
 Multiple plan files can be handled together. The `-t` flag allows the value of epsilon to be set.
 The default value is _0.01_, but _0.001_ is a good value to use for most planners.
@@ -110,19 +144,19 @@ The `-v` switch is the verbose mode.
 
 Syntax for validating your domain model:
 
-`Validate domain.pddl`
+`validate domain.pddl`
 
 Syntax for validating your domain model and problem file:
 
-`Validate domain.pddl problem.pddl`
+`validate domain.pddl problem.pddl`
 
 Syntax for getting more insights into what is happening during your plan (theoretical) execution or validating a hand-coded plan:
 
-`Validate -v -t 0.001 domain.pddl problem.pddl plan.txt`
+`validate -v -t 0.001 domain.pddl problem.pddl plan.txt`
 
 Syntax for generating LaTeX file that visualizes the plan and changes of function values throughout the plan.
 
-`Validate -l -f report -t 0.001 domain.pddl problem.pddl plan.txt`
+`validate -l -f report -t 0.001 domain.pddl problem.pddl plan.txt`
 
 The above will generate report.tex (the .tex extension is automatically added, so need not be placed on the command line).
 

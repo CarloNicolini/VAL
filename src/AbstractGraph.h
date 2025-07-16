@@ -8,37 +8,37 @@
 
 namespace VAL {
 
-  class AbstractProposition {
-   private:
+class AbstractProposition {
+private:
     extended_pred_symbol *eps;
 
-   public:
-    AbstractProposition(extended_pred_symbol *e) : eps(e){};
-  };
+public:
+    AbstractProposition(extended_pred_symbol *e) : eps(e) {};
+};
 
-  class AbstractAction {
-   private:
+class AbstractAction {
+private:
     HWWAction *hww;
 
-   public:
-    AbstractAction(HWWAction *h) : hww(h){};
+public:
+    AbstractAction(HWWAction *h) : hww(h) {};
 
     void write(ostream &o) const {
-      if (hww) {
-        o << *hww;
-      } else {
-        o << "Nil";
-      };
+        if (hww) {
+            o << *hww;
+        } else {
+            o << "Nil";
+        };
     };
-  };
+};
 
-  inline ostream &operator<<(ostream &o, const AbstractAction &a) {
+inline ostream &operator<<(ostream &o, const AbstractAction &a) {
     a.write(o);
     return o;
-  };
+};
 
-  class AbstractGraph {
-   private:
+class AbstractGraph {
+private:
     vector< AbstractProposition * > factSpike;
     vector< AbstractAction * > actionSpike;
 
@@ -49,72 +49,72 @@ namespace VAL {
 
     vector< AbstractAction * > acts;
 
-   public:
-    AbstractGraph() : factLayerSizes(1, 0), layers(0){};
+public:
+    AbstractGraph() : factLayerSizes(1, 0), layers(0) {};
     ~AbstractGraph() {
-      for (vector< AbstractProposition * >::iterator i = factSpike.begin();
-           i != factSpike.end(); ++i) {
-        delete (*i);
-      };
-      for (vector< AbstractAction * >::iterator i = actionSpike.begin();
-           i != actionSpike.end(); ++i) {
-        delete (*i);
-      };
+        for (vector< AbstractProposition * >::iterator i = factSpike.begin();
+                i != factSpike.end(); ++i) {
+            delete (*i);
+        };
+        for (vector< AbstractAction * >::iterator i = actionSpike.begin();
+                i != actionSpike.end(); ++i) {
+            delete (*i);
+        };
     };
 
     void addInitialFact(extended_pred_symbol *eps) {
-      factSpike.push_back(new AbstractProposition(eps));
-      ++factLayerSizes[0];
+        factSpike.push_back(new AbstractProposition(eps));
+        ++factLayerSizes[0];
     };
 
     void addAction(HWWAction *h) {
-      acts.push_back(new AbstractAction(h));
-      cout << "Added action\n";
+        acts.push_back(new AbstractAction(h));
+        cout << "Added action\n";
     };
 
     void develop() {
-      factLayerSizes.push_back(0);
-      while (extend()) {
-        cout << "Extended a layer\n";
         factLayerSizes.push_back(0);
-        addNewFacts();
-      };
+        while (extend()) {
+            cout << "Extended a layer\n";
+            factLayerSizes.push_back(0);
+            addNewFacts();
+        };
 
-      cout << "built\n";
+        cout << "built\n";
     };
 
-   private:
-    void addNewFacts(){};
+private:
+    void addNewFacts() {};
 
     bool extend() {
-      bool change = false;
-      actionLayerSizes.push_back(0);
-      for (unsigned int i = 0; i < acts.size(); ++i) {
-        bool b = newlyApplicable(acts[i]);
-        cout << "Acts: ";
-        if (acts[i]) {
-          cout << *acts[i];
-        } else {
-          cout << "Nil";
+        bool change = false;
+        actionLayerSizes.push_back(0);
+        for (unsigned int i = 0; i < acts.size(); ++i) {
+            bool b = newlyApplicable(acts[i]);
+            cout << "Acts: ";
+            if (acts[i]) {
+                cout << *acts[i];
+            } else {
+                cout << "Nil";
+            };
+            cout << " " << b << "\n";
+            if (acts[i] && b) {
+                actionSpike.push_back(acts[i]);
+                acts[i] = 0;
+                ++actionLayerSizes[layers];
+                change = true;
+            };
         };
-        cout << " " << b << "\n";
-        if (acts[i] && b) {
-          actionSpike.push_back(acts[i]);
-          acts[i] = 0;
-          ++actionLayerSizes[layers];
-          change = true;
-        };
-      };
 
-      return change;
+        return change;
     };
 
     bool newlyApplicable(AbstractAction *a) {
-      static int i = 0;
-      ++i;
-      return i < 3;
+        static int i = 0;
+        ++i;
+        return i < 3;
     };
-  };
+};
 
 };  // namespace VAL
 

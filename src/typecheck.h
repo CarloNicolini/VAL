@@ -15,78 +15,118 @@ using std::vector;
 
 namespace VAL {
 
-  class PTypeRef;
-  class UTypeRef;
-  class TypeHierarchy;
+class PTypeRef;
+class UTypeRef;
+class TypeHierarchy;
 
-  struct TypeRef {
-    virtual ~TypeRef(){};
+struct TypeRef {
+    virtual ~TypeRef() {};
     virtual bool operator<(const TypeRef &t) const = 0;
     virtual bool operator>(const PTypeRef &p) const = 0;
     virtual bool operator>(const UTypeRef &u) const = 0;
     virtual bool operator==(const TypeRef &t) const = 0;
     virtual TypeRef *clone() const = 0;
-    virtual bool operator==(const PTypeRef &p) const { return false; };
-    virtual bool operator==(const UTypeRef &u) const { return false; };
-    virtual bool expected() const { return true; };
+    virtual bool operator==(const PTypeRef &p) const {
+        return false;
+    };
+    virtual bool operator==(const UTypeRef &u) const {
+        return false;
+    };
+    virtual bool expected() const {
+        return true;
+    };
     virtual void addContents(TypeHierarchy *th) const {};
     virtual void show() const = 0;
     virtual const pddl_type *operator*() const = 0;
-  };
+};
 
-  class PTypeRef : public TypeRef {
-   private:
+class PTypeRef : public TypeRef {
+private:
     const pddl_type *pt;
 
-   public:
-    PTypeRef(const pddl_type *p) : pt(p){};
-    bool operator<(const TypeRef &t) const { return t > *this; };
-    bool operator>(const PTypeRef &p) const { return p.pt < pt; };
-    bool operator>(const UTypeRef &u) const { return false; };
-    bool operator==(const TypeRef &t) const { return t == *this; };
-    bool operator==(const PTypeRef &p) const { return pt == p.pt; };
-    TypeRef *clone() const { return new PTypeRef(*this); };
-    void show() const { cout << *pt << "\n"; };
-    const pddl_type *operator*() const { return pt; };
-  };
+public:
+    PTypeRef(const pddl_type *p) : pt(p) {};
+    bool operator<(const TypeRef &t) const {
+        return t > *this;
+    };
+    bool operator>(const PTypeRef &p) const {
+        return p.pt < pt;
+    };
+    bool operator>(const UTypeRef &u) const {
+        return false;
+    };
+    bool operator==(const TypeRef &t) const {
+        return t == *this;
+    };
+    bool operator==(const PTypeRef &p) const {
+        return pt == p.pt;
+    };
+    TypeRef *clone() const {
+        return new PTypeRef(*this);
+    };
+    void show() const {
+        cout << *pt << "\n";
+    };
+    const pddl_type *operator*() const {
+        return pt;
+    };
+};
 
-  class UTypeRef : public TypeRef {
-   private:
+class UTypeRef : public TypeRef {
+private:
     // const
     set< const pddl_type * > pts;
 
-   public:
+public:
     UTypeRef(const pddl_type_list *ps)  //: pts(ps->begin(),ps->end())
     {
-      for (pddl_type_list::const_iterator i = ps->begin(); i != ps->end();
-           ++i) {
-        pts.insert(*i);
-      };
+        for (pddl_type_list::const_iterator i = ps->begin(); i != ps->end();
+                ++i) {
+            pts.insert(*i);
+        };
     };
 
-    UTypeRef(){};
+    UTypeRef() {};
 
-    bool operator<(const TypeRef &t) const { return t > *this; };
-    bool operator>(const PTypeRef &p) const { return true; };
-    bool operator>(const UTypeRef &u) const { return u.pts < pts; };
-    bool operator==(const TypeRef &t) const { return t == *this; };
-    bool operator==(const UTypeRef &u) const { return pts == u.pts; };
-    TypeRef *clone() const { return new UTypeRef(*this); };
-    bool expected() const { return false; };
+    bool operator<(const TypeRef &t) const {
+        return t > *this;
+    };
+    bool operator>(const PTypeRef &p) const {
+        return true;
+    };
+    bool operator>(const UTypeRef &u) const {
+        return u.pts < pts;
+    };
+    bool operator==(const TypeRef &t) const {
+        return t == *this;
+    };
+    bool operator==(const UTypeRef &u) const {
+        return pts == u.pts;
+    };
+    TypeRef *clone() const {
+        return new UTypeRef(*this);
+    };
+    bool expected() const {
+        return false;
+    };
     void addContents(TypeHierarchy *) const;
-    void show() const { cout << "UType\n"; };
-    const pddl_type *operator*() const { return 0; };
-  };
-
-  struct TRcompare
-      : public std::binary_function< const TypeRef *, const TypeRef *, bool > {
-    bool operator()(const TypeRef *t1, const TypeRef *t2) const {
-      return *t1 < *t2;
+    void show() const {
+        cout << "UType\n";
     };
-  };
+    const pddl_type *operator*() const {
+        return 0;
+    };
+};
 
-  class TypeHierarchy {
-   private:
+struct TRcompare
+    : public std::binary_function< const TypeRef *, const TypeRef *, bool > {
+    bool operator()(const TypeRef *t1, const TypeRef *t2) const {
+        return *t1 < *t2;
+    };
+};
+
+class TypeHierarchy {
+private:
     typedef set< const TypeRef * > Nodes;
     typedef map< const TypeRef *, Nodes, TRcompare > Graph;
     typedef Graph::iterator GI;
@@ -100,7 +140,7 @@ namespace VAL {
     Graph downGraph;
     Graph leafNodes;
 
-   public:
+public:
     TypeHierarchy(const analysis *a);
     ~TypeHierarchy();
     bool reachable(const TypeRef &t1, const TypeRef &t2);
@@ -108,17 +148,17 @@ namespace VAL {
 
     const Nodes &leaves(PTypeRef &t);
     vector< const pddl_type * > accumulateAll(const pddl_type *t);
-  };
+};
 
-  class TypeChecker {
-   private:
+class TypeChecker {
+private:
     const analysis *thea;
     TypeHierarchy th;
     const bool isTyped;
 
-   public:
+public:
     TypeChecker(const analysis *a)
-        : thea(a), th(a), isTyped(a->the_domain->types){};
+        : thea(a), th(a), isTyped(a->the_domain->types) {};
     bool typecheckDomain();
     bool typecheckAction(const operator_ *act);
     bool typecheckProblem();
@@ -141,7 +181,7 @@ namespace VAL {
     vector< const pddl_type * > leaves(const pddl_type *t);
     vector< const pddl_type * > accumulateAll(const pddl_type *t);
     bool isLeafType(const pddl_type *t);
-  };
+};
 
 };  // namespace VAL
 

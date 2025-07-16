@@ -5,7 +5,7 @@
  * Macros for diagnostic output.
  * These generate code to output both name and value of a field,
  * and to deal with pretty-printing indentation in a consistent way.
- * 
+ *
  * Edit this file to change the output format of the syntax trees.
  */
 

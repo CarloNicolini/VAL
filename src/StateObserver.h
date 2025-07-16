@@ -6,14 +6,14 @@
 
 namespace VAL {
 
-  class Happening;
-  class EffectsRecord;
+class Happening;
+class EffectsRecord;
 
-  class StateObserver {
-   public:
-    virtual ~StateObserver(){};
-    virtual void notifyChanged(const State *s, const Happening *h){};
-  };
+class StateObserver {
+public:
+    virtual ~StateObserver() {};
+    virtual void notifyChanged(const State *s, const Happening *h) {};
+};
 
 }  // namespace VAL
 #endif

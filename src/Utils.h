@@ -12,33 +12,33 @@ using std::string;
 
 namespace VAL {
 
-  template < typename T >
-  struct ToStringer {
+template < typename T >
+struct ToStringer {
     string operator()(T d) {
-      ostringstream aStringStream;
-      aStringStream << d;
-      return aStringStream.str();
+        ostringstream aStringStream;
+        aStringStream << d;
+        return aStringStream.str();
     };
-  };
+};
 
-  template < typename T >
-  struct ToStringer< T * > {
+template < typename T >
+struct ToStringer< T * > {
     string operator()(T *d) {
-      ostringstream aStringStream;
-      aStringStream << *d;
-      return aStringStream.str();
+        ostringstream aStringStream;
+        aStringStream << *d;
+        return aStringStream.str();
     };
-  };
+};
 
-  template < typename T >
-  string toString(T d) {
+template < typename T >
+string toString(T d) {
     ToStringer< T > ts;
     return ts(d);
-  };
+};
 
-  void replaceSubStrings(string &s, string s1, string s2);
+void replaceSubStrings(string &s, string s1, string s2);
 
-  void latexString(string &s);
+void latexString(string &s);
 
 };  // namespace VAL
 

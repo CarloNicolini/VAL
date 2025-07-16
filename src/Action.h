@@ -18,55 +18,55 @@ using std::set;
 
 namespace VAL {
 
-  class State;
-  class Ownership;
-  class EffectsRecord;
-  class Validator;
-  struct ExecutionContext;
-  struct ActiveCtsEffects;
-  class StartAction;
-  class EndAction;
+class State;
+class Ownership;
+class EffectsRecord;
+class Validator;
+struct ExecutionContext;
+struct ActiveCtsEffects;
+class StartAction;
+class EndAction;
 
-  struct safeaction : public action {
+struct safeaction : public action {
     safeaction(operator_symbol *nm, var_symbol_list *ps, goal *pre,
                effect_lists *effs, var_symbol_table *st)
-        : action(nm, ps, pre, effs, st){};
+        : action(nm, ps, pre, effs, st) {};
 
     ~safeaction() {
-      conj_goal *cg = dynamic_cast< conj_goal * >(precondition);
-      if (cg) const_cast< goal_list * >(cg->getGoals())->clear();
-      // Mustn't delete the preconditions.
-      symtab = 0;      // Mustn't delete the symbol table either.
-      parameters = 0;  // Or the parameters.
-                       // Finally, we don't own the effects, so mustn't
-                       // clobber those either.
-      if (effects) {
-        effects->add_effects.clear();
-        effects->del_effects.clear();
-        effects->forall_effects.clear();
-        effects->cond_effects.clear();
-        effects->assign_effects.clear();
-      }
+        conj_goal *cg = dynamic_cast< conj_goal * >(precondition);
+        if (cg) const_cast< goal_list * >(cg->getGoals())->clear();
+        // Mustn't delete the preconditions.
+        symtab = 0;      // Mustn't delete the symbol table either.
+        parameters = 0;  // Or the parameters.
+        // Finally, we don't own the effects, so mustn't
+        // clobber those either.
+        if (effects) {
+            effects->add_effects.clear();
+            effects->del_effects.clear();
+            effects->forall_effects.clear();
+            effects->cond_effects.clear();
+            effects->assign_effects.clear();
+        }
     };
-  };
+};
 
-  struct sdaction : public action {
+struct sdaction : public action {
     sdaction(operator_symbol *nm, var_symbol_list *ps, goal *pre,
              effect_lists *effs, var_symbol_table *st)
-        : action(nm, ps, pre, effs, st){};
+        : action(nm, ps, pre, effs, st) {};
 
     ~sdaction() {
-      precondition = 0;
-      effects = 0;
-      symtab = 0;      // Mustn't delete the symbol table either.
-      parameters = 0;  // Or the parameters.
-                       // Finally, we don't own the effects, so mustn't
-                       // clobber those either.
+        precondition = 0;
+        effects = 0;
+        symtab = 0;      // Mustn't delete the symbol table either.
+        parameters = 0;  // Or the parameters.
+        // Finally, we don't own the effects, so mustn't
+        // clobber those either.
     };
-  };
+};
 
-  class Action {
-   protected:
+class Action {
+protected:
     const operator_ *act;
     Environment bindings;
 
@@ -85,18 +85,18 @@ namespace VAL {
                        const effect_lists *effs, bool markPreCons) const;
 
     struct ActionParametersOutput {
-      const Environment &bindings;
+        const Environment &bindings;
 
-      ActionParametersOutput(const Environment &bs) : bindings(bs){};
-      string operator()(const var_symbol *v) const {
-        return bindings.find(v)->second->getName();
-      };
+        ActionParametersOutput(const Environment &bs) : bindings(bs) {};
+        string operator()(const var_symbol *v) const {
+            return bindings.find(v)->second->getName();
+        };
     };
 
     friend struct FAEhandler;
     friend struct ActiveCtsEffects;
 
-   public:
+public:
     Action(Validator *v, const operator_ *a, const const_symbol_list *bs);
     Action(Validator *v, const operator_ *a, Environment *bs);
     Action(Validator *v, const operator_ *a,
@@ -106,11 +106,21 @@ namespace VAL {
 
     virtual ~Action();
 
-    const effect_lists *getEffects() const { return act->effects; };
-    const Environment &getBindings() const { return bindings; };
-    const operator_ *getAction() const { return act; };
-    const plan_step *getPlanStep() const { return planStep; };
-    const Proposition *getPrecondition() const { return pre; };
+    const effect_lists *getEffects() const {
+        return act->effects;
+    };
+    const Environment &getBindings() const {
+        return bindings;
+    };
+    const operator_ *getAction() const {
+        return act;
+    };
+    const plan_step *getPlanStep() const {
+        return planStep;
+    };
+    const Proposition *getPrecondition() const {
+        return pre;
+    };
     string getName() const;
     string getName0() const;
     virtual void displayDurationAdvice(const State *s) const {};
@@ -128,52 +138,70 @@ namespace VAL {
         vector< const Action * > &oldTriggeredEvents,
         vector< const StartAction * > &triggeredStartProcesses,
         vector< const EndAction * > &triggeredEndProcesses) const;
-    virtual void write(ostream &o) const { o << getName(); };
+    virtual void write(ostream &o) const {
+        o << getName();
+    };
 
-    virtual bool isRealAction() const { return !timedInitialLiteral; };
-    virtual bool isRegAction() const { return true; };
+    virtual bool isRealAction() const {
+        return !timedInitialLiteral;
+    };
+    virtual bool isRegAction() const {
+        return true;
+    };
 
-    virtual const Action *startOfAction() const { return this; };
+    virtual const Action *startOfAction() const {
+        return this;
+    };
     bool operator==(const plan_step &ps) const;
-  };
+};
 
-  class InvariantAction : public Action {
-   private:
+class InvariantAction : public Action {
+private:
     ActiveCtsEffects *ace;
     StartAction *start;
     mutable bool rhsIntervalOpen;  // only open for last interval that invariant
-                                   // is checked on
-   public:
+    // is checked on
+public:
     InvariantAction(Validator *v, StartAction *sa, const action *a,
                     const const_symbol_list *bs, const plan_step *ps = 0)
-        : Action(v, a, bs, ps), start(sa), rhsIntervalOpen(false){};
+        : Action(v, a, bs, ps), start(sa), rhsIntervalOpen(false) {};
 
     ~InvariantAction();
     bool confirmPrecondition(const State *s) const;
     void addErrorRecord(double t, const State *s) const;
-    void setActiveCtsEffects(ActiveCtsEffects *a) { ace = a; };
-    void setRhsIntervalOpen(bool rhs) const { rhsIntervalOpen = rhs; };
-    bool isRealAction() const { return false; };
-    bool isRegAction() const { return false; };
+    void setActiveCtsEffects(ActiveCtsEffects *a) {
+        ace = a;
+    };
+    void setRhsIntervalOpen(bool rhs) const {
+        rhsIntervalOpen = rhs;
+    };
+    bool isRealAction() const {
+        return false;
+    };
+    bool isRegAction() const {
+        return false;
+    };
 
     void write(ostream &o) const {
-      if (LaTeX) {
-        o << "\\actioninv{";
-        Action::write(o);
-        o << "}";
-      } else {
-        o << "Invariant for ";
-        Action::write(o);
-      };
+        if (LaTeX) {
+            o << "\\actioninv{";
+            Action::write(o);
+            o << "}";
+        } else {
+            o << "Invariant for ";
+            Action::write(o);
+        };
     };
 
     const Action *partner() const;
 
-    const Action *startOfAction() const { return (const Action *)start; };
-  };
+    const Action *startOfAction() const {
+        return (const Action *)start;
+    };
+};
 
-  class CondCommunicationAction : public Action {
-   private:
+class CondCommunicationAction : public Action {
+private:
     mutable bool status;
     ActiveCtsEffects *ace;
     mutable bool rhsIntervalOpen;
@@ -186,7 +214,7 @@ namespace VAL {
 
     effect_lists *els;
 
-   public:
+public:
     CondCommunicationAction(Validator *v, const durative_action *a,
                             const const_symbol_list *bs, goal_list *gs,
                             goal_list *gi, goal_list *ge, effect_lists *es,
@@ -200,14 +228,14 @@ namespace VAL {
     void write(ostream &o) const
 
     {
-      if (LaTeX) {
-        o << "\\condeffmon{";
-        Action::write(o);
-        o << "}";
-      } else {
-        Action::write(o);
-        o << " - conditional effect monitor";
-      };
+        if (LaTeX) {
+            o << "\\condeffmon{";
+            Action::write(o);
+            o << "}";
+        } else {
+            Action::write(o);
+            o << " - conditional effect monitor";
+        };
     };
 
     void markInitialPreconditions(Ownership &o) const;
@@ -216,34 +244,46 @@ namespace VAL {
     bool confirmPrecondition(const State *s) const;
     bool constructEffects(Ownership &o, EffectsRecord &e, const State *s,
                           bool markPreCons) const;
-    void setActiveCtsEffects(ActiveCtsEffects *a) { ace = a; };
-    void setRhsIntervalOpen(bool rhs) const { rhsIntervalOpen = rhs; };
+    void setActiveCtsEffects(ActiveCtsEffects *a) {
+        ace = a;
+    };
+    void setRhsIntervalOpen(bool rhs) const {
+        rhsIntervalOpen = rhs;
+    };
     bool confirmInitialPrecondition(const State *s) const;
     bool constructFinalEffects(Ownership &o, EffectsRecord &e,
                                const State *s) const;
-    bool isActive() const { return status; };
-    bool isRealAction() const { return false; };
-    bool isRegAction() const { return false; };
+    bool isActive() const {
+        return status;
+    };
+    bool isRealAction() const {
+        return false;
+    };
+    bool isRegAction() const {
+        return false;
+    };
     const Action *partner() const;
-    const Action *startOfAction() const { return (const Action *)start; };
-  };
+    const Action *startOfAction() const {
+        return (const Action *)start;
+    };
+};
 
-  void buildForAllCondActions(
-      Validator *vld, const durative_action *da,
-      const const_symbol_list *params, goal_list *gls, goal_list *gli,
-      goal_list *gle, effect_lists *locels, effect_lists *locele,
-      const var_symbol_list *vars, var_symbol_list::const_iterator i,
-      vector< const CondCommunicationAction * > &condActions, Environment *env);
+void buildForAllCondActions(
+    Validator *vld, const durative_action *da,
+    const const_symbol_list *params, goal_list *gls, goal_list *gli,
+    goal_list *gle, effect_lists *locels, effect_lists *locele,
+    const var_symbol_list *vars, var_symbol_list::const_iterator i,
+    vector< const CondCommunicationAction * > &condActions, Environment *env);
 
-  class CtsEffectAction : public Action {
-   private:
+class CtsEffectAction : public Action {
+private:
     ActiveCtsEffects *ace;
     StartAction *start;
 
-   public:
+public:
     CtsEffectAction(Validator *v, const action *a, const const_symbol_list *bs,
                     const vector< const CondCommunicationAction * > &cas)
-        : Action(v, a, bs), condActions(cas){};
+        : Action(v, a, bs), condActions(cas) {};
 
     ~CtsEffectAction();
 
@@ -252,23 +292,31 @@ namespace VAL {
     bool constructEffects(Ownership &o, EffectsRecord &e, const State *s,
                           bool markPreCons) const;
     void setHasht(double ht);
-    void setActiveCtsEffects(ActiveCtsEffects *a) { ace = a; };
+    void setActiveCtsEffects(ActiveCtsEffects *a) {
+        ace = a;
+    };
     void displayCtsFtns() const;
-    bool isRealAction() const { return false; };
-    bool isRegAction() const { return false; };
+    bool isRealAction() const {
+        return false;
+    };
+    bool isRegAction() const {
+        return false;
+    };
 
     void write(ostream &o) const {
-      if (LaTeX) {
-        o << "\\updatectspne";
-      } else
-        o << "Update of continuously changing Primitive Numerical Expressions";
+        if (LaTeX) {
+            o << "\\updatectspne";
+        } else
+            o << "Update of continuously changing Primitive Numerical Expressions";
     };
     const Action *partner() const;
-    const Action *startOfAction() const { return (const Action *)start; };
-  };
+    const Action *startOfAction() const {
+        return (const Action *)start;
+    };
+};
 
-  class DurativeActionElement : public Action {
-   protected:
+class DurativeActionElement : public Action {
+protected:
     double duration;
     const goal_list *durs;
 
@@ -277,7 +325,7 @@ namespace VAL {
 
     const vector< const CondCommunicationAction * > condActions;
 
-   public:
+public:
     DurativeActionElement(Validator *v, const action *a,
                           const const_symbol_list *bs, double d,
                           const goal_list *ds, const InvariantAction *inv,
@@ -290,23 +338,27 @@ namespace VAL {
           invariant(inv),
           ctsEffects(ctsEff),
           condActions(cas) {
-      bindings.duration = duration;
+        bindings.duration = duration;
     };
     virtual ~DurativeActionElement();
 
     void markOwnedPreconditions(Ownership &) const;
     bool confirmPrecondition(const State *s) const;
-    double getDuration() const { return duration; };
-    bool isRegAction() const { return true; };
-  };
+    double getDuration() const {
+        return duration;
+    };
+    bool isRegAction() const {
+        return true;
+    };
+};
 
-  class EndAction;
+class EndAction;
 
-  class StartAction : public DurativeActionElement {
-   private:
+class StartAction : public DurativeActionElement {
+private:
     mutable EndAction *otherEnd;
 
-   public:
+public:
     friend class EndAction;
 
     StartAction(Validator *v, const action *a, const const_symbol_list *bs,
@@ -318,36 +370,36 @@ namespace VAL {
         : DurativeActionElement(
               v, a, bs, d, ds,
               (inv && inv->getGoals()->empty()) ? 0 :  // do not create
-                                                       // invariant action if no
-                                                       // invariants to check!
-                  new InvariantAction(
-                      v, this,
-                      new safeaction(a->name, a->parameters,
-                                     const_cast< conj_goal * >(inv),
-                                     new effect_lists(), a->symtab),
-                      bs, ps),
+              // invariant action if no
+              // invariants to check!
+              new InvariantAction(
+                  v, this,
+                  new safeaction(a->name, a->parameters,
+                                 const_cast< conj_goal * >(inv),
+                                 new effect_lists(), a->symtab),
+                  bs, ps),
               (elc && elc->assign_effects.empty() &&
                elc->forall_effects.empty() && ccas.empty())
-                  ? 0
-                  :  // similarly do not create cts effect action if no cts
-                     // effects!
-                  new CtsEffectAction(
-                      v,
-                      new safeaction(
-                          a->name, a->parameters,
-                          new conj_goal(new goal_list()),  // no preconditions
-                          elc, a->symtab),
-                      bs, ccas),
+              ? 0
+              :  // similarly do not create cts effect action if no cts
+              // effects!
+              new CtsEffectAction(
+                  v,
+                  new safeaction(
+                      a->name, a->parameters,
+                      new conj_goal(new goal_list()),  // no preconditions
+                      elc, a->symtab),
+                  bs, ccas),
               cas, ps) {
-      if (inv && inv->getGoals()->empty()) delete inv;
-      if (elc && elc->assign_effects.empty() && elc->forall_effects.empty() &&
-          ccas.empty())
-        delete elc;
+        if (inv && inv->getGoals()->empty()) delete inv;
+        if (elc && elc->assign_effects.empty() && elc->forall_effects.empty() &&
+                ccas.empty())
+            delete elc;
     };
 
     ~StartAction() {
-      delete invariant;
-      delete ctsEffects;
+        delete invariant;
+        delete ctsEffects;
     };
 
     void adjustContext(ExecutionContext &) const;
@@ -363,33 +415,35 @@ namespace VAL {
         vector< const EndAction * > &triggeredEndProcesses) const;
     void displayEventInfomation() const;
     void write(ostream &o) const {
-      if (LaTeX) {
-        o << "\\actionstart{";
-        Action::write(o);
-        o << "}";
-      } else {
-        Action::write(o);
-        o << " - start";
-      };
+        if (LaTeX) {
+            o << "\\actionstart{";
+            Action::write(o);
+            o << "}";
+        } else {
+            Action::write(o);
+            o << " - start";
+        };
     };
     const Action *partner() const;
-    const Action *starter() const { return this; };
-  };
+    const Action *starter() const {
+        return this;
+    };
+};
 
-  class EndAction : public DurativeActionElement {
-   private:
+class EndAction : public DurativeActionElement {
+private:
     const StartAction *otherEnd;
 
-   public:
+public:
     EndAction(Validator *v, const action *a, const const_symbol_list *bs,
               const StartAction *sa, double d, const goal_list *ds,
               const plan_step *ps = 0)
         : DurativeActionElement(v, a, bs, d, ds, sa->invariant, sa->ctsEffects,
                                 sa->condActions, ps),
           otherEnd(sa) {
-      sa->otherEnd = this;
+        sa->otherEnd = this;
     };
-    ~EndAction(){};
+    ~EndAction() {};
 
     void adjustContext(ExecutionContext &) const;
 
@@ -397,7 +451,9 @@ namespace VAL {
     void adjustActiveCtsEffects(ActiveCtsEffects &) const;
     bool constructEffects(Ownership &o, EffectsRecord &e, const State *s,
                           bool markPreCons) const;
-    const Action *partner() const { return otherEnd; };
+    const Action *partner() const {
+        return otherEnd;
+    };
     void addTriggeredEvents(
         vector< const Action * > &triggeredEvents,
         vector< const Action * > &oldTriggeredEvents,
@@ -405,31 +461,33 @@ namespace VAL {
         vector< const EndAction * > &triggeredEndProcesses) const;
     void displayEventInfomation() const;
     void write(ostream &o) const {
-      if (LaTeX) {
-        o << "\\actionend{";
-        Action::write(o);
-        o << "}";
-      } else {
-        Action::write(o);
-        o << " - end";
-      };
+        if (LaTeX) {
+            o << "\\actionend{";
+            Action::write(o);
+            o << "}";
+        } else {
+            Action::write(o);
+            o << " - end";
+        };
     };
-    const Action *startOfAction() const { return otherEnd; };
-  };
+    const Action *startOfAction() const {
+        return otherEnd;
+    };
+};
 
-  ostream &operator<<(ostream &o, const Action &a);
-  ostream &operator<<(ostream &o, const Action *const a);
+ostream &operator<<(ostream &o, const Action &a);
+ostream &operator<<(ostream &o, const Action *const a);
 
-  template < typename T >
-  const Environment buildBindings(const operator_ *a, const T &bs) {
+template < typename T >
+const Environment buildBindings(const operator_ *a, const T &bs) {
     Environment bindings;
     typename T::const_iterator j = bs.begin();
     for (var_symbol_list::iterator i = a->parameters->begin();
-         i != a->parameters->end(); ++i, ++j) {
-      bindings[*i] = *j;
+            i != a->parameters->end(); ++i, ++j) {
+        bindings[*i] = *j;
     };
     return bindings;
-  };
+};
 
 };  // namespace VAL
 

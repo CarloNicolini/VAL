@@ -8,14 +8,14 @@
 
 namespace VAL {
 
-  class PrettyPrinter : public WriteController {
-   private:
+class PrettyPrinter : public WriteController {
+private:
     bool showType;
     bool firstCall;
     bool inInitial;
 
-   public:
-    PrettyPrinter() : showType(true), firstCall(true), inInitial(false){};
+public:
+    PrettyPrinter() : showType(true), firstCall(true), inInitial(false) {};
 
     virtual void write_symbol(ostream &o, const symbol *);
     virtual void write_const_symbol(ostream &o, const const_symbol *);
@@ -62,11 +62,13 @@ namespace VAL {
     virtual void write_problem(ostream &o, const problem *);
     virtual void write_plan_step(ostream &o, const plan_step *);
     virtual void write_constraint_goal(ostream &o, const constraint_goal *g);
-    void setShowType(bool b) { showType = b; }
+    void setShowType(bool b) {
+        showType = b;
+    }
 
-   private:
+private:
     virtual void collect_symbols(var_symbol_list &vs, const expression *e);
-  };
+};
 
 };  // namespace VAL
 
