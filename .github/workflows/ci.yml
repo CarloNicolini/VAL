@@ -1,0 +1,44 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Install dependencies (Ubuntu)
+      if: matrix.os == 'ubuntu-latest'
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y cmake make g++ clang-format doxygen graphviz
+        
+    - name: Install dependencies (macOS)
+      if: matrix.os == 'macos-latest'
+      run: |
+        brew install cmake doxygen graphviz
+        
+    - name: Create build directory
+      run: mkdir build
+      
+    - name: Configure CMake
+      run: cd build && cmake ..
+      
+    - name: Build project
+      run: cd build && make -j$(nproc 2>/dev/null || sysctl -n hw.ncpu)
+      
+    - name: Test executables exist
+      run: |
+        ls -la build/bin/
+        test -f build/bin/validate || (echo "validate executable not found" && exit 1) 
