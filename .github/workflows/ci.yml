@@ -33,7 +33,7 @@ jobs:
       run: mkdir build
       
     - name: Configure CMake
-      run: cd build && cmake ..
+      run: cd build && cmake-DCMAKE_POLICY_VERSION_MINIMUM=3.5 ..
       
     - name: Build project
       run: cd build && make -j$(nproc 2>/dev/null || sysctl -n hw.ncpu)
