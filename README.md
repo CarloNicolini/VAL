@@ -3,6 +3,8 @@
 **Note:** This repository is a cleaned copy of the main [KCL VAL project](https://github.com/KCL-Planning/VAL). It removes many unnecessary contents and binaries, drops Windows support, and features a much-simplified structure and CMake files to better support compilation on Mac and Linux systems.
 It also makes it possible to build VAL with Docker, for improved compatibility.
 
+> I don't plan (pun intended) to accept issues or comments because I am NOT the author of the `.h` and `.cpp` files and all the credits go to the authors of the original VAL.
+
 [![Build Status](https://dev.azure.com/schlumberger/ai-planning-validation/_apis/build/status/ai-planning-tool-val-CI?branchName=master)](https://dev.azure.com/schlumberger/ai-planning-validation/_build/latest?definitionId=2&branchName=master)
 
 ## How to use Docker
