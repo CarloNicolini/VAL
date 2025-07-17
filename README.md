@@ -7,6 +7,35 @@ It also makes it possible to build VAL with Docker, for improved compatibility.
 
 [![Build Status](https://dev.azure.com/schlumberger/ai-planning-validation/_apis/build/status/ai-planning-tool-val-CI?branchName=master)](https://dev.azure.com/schlumberger/ai-planning-validation/_build/latest?definitionId=2&branchName=master)
 
+## How to build (macos, linux)
+
+We follow the standard CMake building process. First create a `build` folder then run CMake on it. The executables
+
+```sh
+mkdir build
+cmake -DCMAKE_POLICY_VERSION_MINIMUM=3.5 
+make -j
+```
+
+A list of executables should be built inside the folder `build/bin`: the following is the list of the binaries you should see, alongside the `libVAL.{dylib, so}` depending if you compile on Mac or Linux.
+
+- `analyse`
+- `howwhatwhen`
+- `pinguplan`
+- `planseqstep`
+- `relax`
+- `tofn`
+- `validate`
+- `valueseq`
+- `domainview`
+- `instantiate`
+- `parser`
+- `planrec`
+- `plantovalstep`
+- `tim-main`
+- `typeanalysis`
+- `valstep`
+
 ## How to use Docker
 
 You can build and run VAL applications using Docker for improved compatibility and ease of setup. Here is the typical workflow:
